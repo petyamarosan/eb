@@ -10,13 +10,14 @@
 #include <capnp/serialize.h>
 
 #include "ServerClientFunctions.cpp"
+#include "utils.cpp"
 
 using namespace std;
 using namespace ericsson2017::protocol::semifinal;
 
 
 extern std::vector<std::vector<int>> table;
-extern int posX, posY;
+extern vector<int> posX, posY;
 
 
 int main(int argc, char *argv[])
@@ -41,7 +42,7 @@ int main(int argc, char *argv[])
     sendCommand(sockfd, 0, Direction::RIGHT);
     receiveResponse(sockfd);
 
-    while (table[posX][posY] != 1){
+    while (table[posX[0]][posY[0]] != 1){
         sendCommand(sockfd, 0, Direction::RIGHT);
         receiveResponse(sockfd);
     }
@@ -55,7 +56,7 @@ int main(int argc, char *argv[])
     sendCommand(sockfd, 0, Direction::DOWN);
     receiveResponse(sockfd);
 
-    while (table[posX][posY] != 1){
+    while (table[posX[0]][posY[0]] != 1){
         sendCommand(sockfd, 0, Direction::DOWN);
         receiveResponse(sockfd);
     }
@@ -69,7 +70,7 @@ int main(int argc, char *argv[])
     sendCommand(sockfd, 0, Direction::LEFT);
     receiveResponse(sockfd);
 
-    while (table[posX][posY] != 1){
+    while (table[posX[0]][posY[0]] != 1){
         sendCommand(sockfd, 0, Direction::LEFT);
         receiveResponse(sockfd);
     }
@@ -84,7 +85,7 @@ int main(int argc, char *argv[])
     sendCommand(sockfd, 0, Direction::UP);
     receiveResponse(sockfd);
 
-    while (table[posX][posY] != 1){
+    while (table[posX[0]][posY[0]] != 1){
         sendCommand(sockfd, 0, Direction::UP);
         receiveResponse(sockfd);
     }
@@ -107,7 +108,7 @@ margin = 6;
     sendCommand(sockfd, 0, Direction::RIGHT);
     receiveResponse(sockfd);
 
-    while (table[posX][posY] != 1){
+    while (table[posX[0]][posY[0]] != 1){
         sendCommand(sockfd, 0, Direction::RIGHT);
         receiveResponse(sockfd);
     }
@@ -121,7 +122,7 @@ margin = 6;
     sendCommand(sockfd, 0, Direction::DOWN);
     receiveResponse(sockfd);
 
-    while (table[posX][posY] != 1){
+    while (table[posX[0]][posY[0]] != 1){
         sendCommand(sockfd, 0, Direction::DOWN);
         receiveResponse(sockfd);
     }
@@ -135,7 +136,7 @@ margin = 6;
     sendCommand(sockfd, 0, Direction::LEFT);
     receiveResponse(sockfd);
 
-    while (table[posX][posY] != 1){
+    while (table[posX[0]][posY[0]] != 1){
         sendCommand(sockfd, 0, Direction::LEFT);
         receiveResponse(sockfd);
     }
@@ -157,7 +158,7 @@ margin = 6;
     sendCommand(sockfd, 0, Direction::UP);
     receiveResponse(sockfd, true);
 
-    while (table[posX][posY] != 1){
+    while (table[posX[0]][posY[0]] != 1){
         sendCommand(sockfd, 0, Direction::UP);
         receiveResponse(sockfd, true);
     }
@@ -183,7 +184,7 @@ margin =4;
     sendCommand(sockfd, 0, Direction::RIGHT);
     receiveResponse(sockfd, true);
 
-    while (table[posX][posY] != 1){
+    while (table[posX[0]][posY[0]] != 1){
         sendCommand(sockfd, 0, Direction::RIGHT);
         receiveResponse(sockfd, true);
     }
@@ -197,7 +198,7 @@ margin =4;
     sendCommand(sockfd, 0, Direction::DOWN);
     receiveResponse(sockfd, true);
 
-    while (table[posX][posY] != 1){
+    while (table[posX[0]][posY[0]] != 1){
         sendCommand(sockfd, 0, Direction::DOWN);
         receiveResponse(sockfd, true);
     }

@@ -13,7 +13,7 @@ using namespace std;
 using namespace ericsson2017::protocol::semifinal;
 
 std::vector<std::vector<int>> table(80, std::vector<int>(100, 0));
-int posX, posY;
+vector<int> posX, posY;
 /*
  * Send a login request to the server
  * fd - socket's file descriptor
@@ -62,6 +62,8 @@ void sendCommand(int fd, int32_t unit, Direction dir)
  */
 void receiveResponse(int fd, bool disp=true)
 {
+    posX.clear();
+    posY.clear();
     // Init message
     ::capnp::MallocMessageBuilder message;
     // Get message from socket
@@ -76,9 +78,6 @@ void receiveResponse(int fd, bool disp=true)
     Response::Info::Reader info = response.getInfo();
     if (disp)
     cout << "\n \tOwns: " << info.getOwns() << "\n \tLevel: " << info.getLevel() << "\n \tTick: " << info.getTick();
-
-    int colU;
-    int rowU;
 
     for (Unit::Reader unit : response.getUnits())
     {
@@ -113,14 +112,12 @@ void receiveResponse(int fd, bool disp=true)
         cout << "\t\tHealth: " << unit.getHealth();
         cout << "\n\t\tKiller: " << unit.getKiller();
         cout << "\n\t\tOwner: " << unit.getOwner();}
-        colU = unit.getPosition().getX();
-        rowU = unit.getPosition().getY();
-        posX = colU;
-        posY = rowU;
+        posX.push_back(unit.getPosition().getX());
+        posY.push_back(unit.getPosition().getY());
     }
 
-    int colE;
-    int rowE;
+    vector<int> colE;
+    vector<int> rowE;
 
     for (Enemy::Reader enemy : response.getEnemies())
     {
@@ -160,8 +157,8 @@ void receiveResponse(int fd, bool disp=true)
     if (disp)
             cout << "]" << endl;
 
-            colE = enemy.getPosition().getX();
-            rowE = enemy.getPosition().getY();
+            colE.push_back(enemy.getPosition().getX());
+            rowE.push_back(enemy.getPosition().getY());
         }
         int i = 0;
         int j = 0;
@@ -174,11 +171,27 @@ void receiveResponse(int fd, bool disp=true)
             {
                 table[i][j] = cell.getOwner();
                 if(disp){
-                    if (j == rowU && i == colU)
-                        cout << "*";
-                    else if (j == rowE && i == colE)
-                        cout << " ";
-                    else
+                    bool enemyOrUnit = false;
+                    for(int indU = 0;indU<posY.size();indU++)
+                    {
+                         if (j == posY[indU] && i == posX[indU])
+                         {
+                            cout << "*";
+                            enemyOrUnit = true;
+                            break;
+                         }
+                           
+                    }
+                    for(int indE = 0;indE<rowE.size();indE++)
+                    {
+                        if (j == rowE[indE] && i == colE[indE])
+                        {
+                            cout << " ";
+                            enemyOrUnit = true;
+                            break;
+                        }
+                    }
+                    if(!enemyOrUnit)
                         cout << cell.getOwner();
                 }
                 j++;

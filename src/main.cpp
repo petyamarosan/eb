@@ -31,11 +31,14 @@ int main(int argc, char *argv[])
 
     int margin = 9;
 
+    vector<int>  d, posSafeX, posSafeY;
     // RIGHT
     for (int i = 0; i < margin; i++)
     {
         sendCommand(sockfd, 0, Direction::DOWN);
         receiveResponse(sockfd);
+        getClosestSafeCell(d, posSafeX, posSafeY);
+        cout<<"d: "<<d[0]<<"x: "<<posSafeX[0]<<"y: "<<posSafeY[0]<<endl;
     }
     sendCommand(sockfd, 0, Direction::RIGHT);
     receiveResponse(sockfd);
@@ -45,6 +48,8 @@ int main(int argc, char *argv[])
     while (table[posX[0]][posY[0]] != 1){
         sendCommand(sockfd, 0, Direction::RIGHT);
         receiveResponse(sockfd);
+        getClosestSafeCell(d, posSafeX, posSafeY);
+        cout<<"d: "<<d[0]<<"x: "<<posSafeX[0]<<"y: "<<posSafeY[0]<<endl;
     }
    
     // DOWN

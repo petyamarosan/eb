@@ -179,7 +179,7 @@ void receiveResponse(int fd, bool disp=true)
                     {
                          if (j == posY[indU] && i == posX[indU])
                          {
-                            cout << "*";
+                            cout << "* ";
                             enemyOrUnit = true;
                             break;
                          }
@@ -189,13 +189,13 @@ void receiveResponse(int fd, bool disp=true)
                     {
                         if (j == rowE[indE] && i == colE[indE])
                         {
-                            cout << " ";
+                            cout << "  ";
                             enemyOrUnit = true;
                             break;
                         }
                     }
                     if(!enemyOrUnit)
-                        cout << cell.getOwner();
+                        cout << cell.getOwner() << " ";
                 }
                 j++;
             }

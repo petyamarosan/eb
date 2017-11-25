@@ -8,6 +8,7 @@
 #include "Command.capnp.h"
 #include "Response.capnp.h"
 #include <capnp/serialize.h>
+#include <capnp/serialize-packed.h>
 
 using namespace std;
 using namespace ericsson2017::protocol::semifinal;
@@ -36,7 +37,7 @@ void sendLoginRequest(int fd, ::capnp::Text::Reader hash = "r8h9nqvoio0ugpwr51fz
          << "Hash: " << command.getCommands().getLogin().getHash().cStr() << "\n\t"
          << "Team: " << command.getCommands().getLogin().getTeam().cStr() << endl;
     // Send message
-    writeMessageToFd(fd, message);
+    writePackedMessageToFd(fd, message);
 }
 
 void sendCommand(int fd, int32_t unit, Direction dir)
@@ -53,7 +54,7 @@ void sendCommand(int fd, int32_t unit, Direction dir)
     // Print request
     //cout<<endl<<"Request details: \n\t"<<"Hash: "<<moves[0].getU.cStr()<<"\n\t"<<"Team: "<<command.getCommands().getLogin().getTeam().cStr()<<endl;
     // Send message
-    writeMessageToFd(fd, message);
+    writePackedMessageToFd(fd, message);
 }
 /*
  * Receive response
@@ -65,9 +66,9 @@ void receiveResponse(int fd, bool disp=true)
     posX.clear();
     posY.clear();
     // Init message
-    ::capnp::MallocMessageBuilder message;
+
     // Get message from socket
-    capnp::readMessageCopyFromFd(fd, message);
+    capnp::PackedFdMessageReader message(fd);
     // Get response
     Response::Reader response = message.getRoot<Response>();
 
@@ -210,7 +211,7 @@ void receiveResponse(int fd, bool disp=true)
  * portno - port number
  * return socket fd
  */
-int setUpClient(const char *hostName = "ecovpn.dyndns.org", int portno = 11224)
+int setUpClient(const char *hostName = "epb2017.dyndns.org", int portno = 11224)
 {
     int sockfd;
     struct sockaddr_in serv_addr;

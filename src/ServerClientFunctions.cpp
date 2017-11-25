@@ -15,6 +15,7 @@ using namespace ericsson2017::protocol::semifinal;
 
 std::vector<std::vector<int>> table(80, std::vector<int>(100, 0));
 vector<int> posX, posY;
+uint currentHealth;
 /*
  * Send a login request to the server
  * fd - socket's file descriptor
@@ -111,6 +112,7 @@ void receiveResponse(int fd, bool disp=true)
         if (disp){
         cout << endl;
         cout << "\t\tHealth: " << unit.getHealth();
+        currentHealth = unit.getHealth();
         cout << "\n\t\tKiller: " << unit.getKiller();
         cout << "\n\t\tOwner: " << unit.getOwner();}
         posX.push_back(unit.getPosition().getX());

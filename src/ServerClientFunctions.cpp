@@ -15,6 +15,8 @@ using namespace ericsson2017::protocol::semifinal;
 
 std::vector<std::vector<int>> table(80, std::vector<int>(100, 0));
 vector<int> posX, posY;
+vector<int> enemyPosX, enemyPosY;
+vector<int> enemyDirX, enemyDirY;
 uint currentHealth;
 /*
  * Send a login request to the server
@@ -62,10 +64,14 @@ void sendCommand(int fd, int32_t unit, Direction dir)
  * numBugs - number of actual bugs
  * exit_ - end of the game or not
  */
-void receiveResponse(int fd, bool disp=true)
+void receiveResponse(int fd, bool disp = true)
 {
     posX.clear();
     posY.clear();
+    enemyPosX.clear();
+    enemyPosY.clear();
+    enemyDirX.clear();
+    enemyDirY.clear();
     // Init message
 
     // Get message from socket
@@ -75,136 +81,147 @@ void receiveResponse(int fd, bool disp=true)
 
     // Print Status
     if (disp)
-    cout << "Response details:\n\tStatus: " << response.getStatus().cStr();
+        cout << "Response details:\n\tStatus: " << response.getStatus().cStr();
 
     Response::Info::Reader info = response.getInfo();
     if (disp)
-    cout << "\n \tOwns: " << info.getOwns() << "\n \tLevel: " << info.getLevel() << "\n \tTick: " << info.getTick();
+        cout << "\n \tOwns: " << info.getOwns() << "\n \tLevel: " << info.getLevel() << "\n \tTick: " << info.getTick();
 
     for (Unit::Reader unit : response.getUnits())
     {
         if (disp)
-        cout << "\n \tUnit: "
-             << "\n \t\tPos: [" << unit.getPosition().getX() << ", " << unit.getPosition().getY() << "]" << endl;
+            cout << "\n \tUnit: "
+                 << "\n \t\tPos: [" << unit.getPosition().getX() << ", " << unit.getPosition().getY() << "]" << endl;
         if (disp)
-        cout << "\t\tDirection: ";
+            cout << "\t\tDirection: ";
         switch (unit.getDirection())
         {
         case Direction::UP:
-        if (disp)
-            cout << "UP";
+            if (disp)
+                cout << "UP";
             break;
         case Direction::DOWN:
-        if (disp)
-            cout << "DOWN";
+            if (disp)
+                cout << "DOWN";
             break;
         case Direction::LEFT:
-        if (disp)
-            cout << "LEFT";
+            if (disp)
+                cout << "LEFT";
             break;
         case Direction::RIGHT:
-        if (disp)
-            cout << "RIGHT";
+            if (disp)
+                cout << "RIGHT";
             break;
         default:
             cout << "Unknown direction!";
         }
-        if (disp){
-        cout << endl;
-        cout << "\t\tHealth: " << unit.getHealth();
-        currentHealth = unit.getHealth();
-        cout << "\n\t\tKiller: " << unit.getKiller();
-        cout << "\n\t\tOwner: " << unit.getOwner();}
+        if (disp)
+        {
+            cout << endl;
+            cout << "\t\tHealth: " << unit.getHealth();
+            currentHealth = unit.getHealth();
+            cout << "\n\t\tKiller: " << unit.getKiller();
+            cout << "\n\t\tOwner: " << unit.getOwner();
+        }
         posX.push_back(unit.getPosition().getX());
         posY.push_back(unit.getPosition().getY());
     }
 
-    vector<int> colE;
-    vector<int> rowE;
-
     for (Enemy::Reader enemy : response.getEnemies())
     {
         if (disp)
-        cout << "\n \tEnemies: "
-             << "\n \t\tPos: [" << enemy.getPosition().getX() << ", " << enemy.getPosition().getY() << "]" << endl;
-             if (disp)
-        cout << "\t\tDirection: [";
+            cout << "\n \tEnemies: "
+                 << "\n \t\tPos: [" << enemy.getPosition().getX() << ", " << enemy.getPosition().getY() << "]" << endl;
+        if (disp)
+            cout << "\t\tDirection: [";
         switch (enemy.getDirection().getVertical())
         {
         case Direction::UP:
-        if (disp)
-            cout << "UP";
+            enemyDirX.push_back(-1);
+            if (disp)
+            {
+                cout << "UP";
+            }
             break;
         case Direction::DOWN:
-        if (disp)
-            cout << "DOWN";
+            enemyDirX.push_back(1);
+            if (disp)
+            {
+                cout << "DOWN";
+            }
             break;
         default:
             cout << "Unknown direction!";
         }
         if (disp)
-        cout << ", ";
+            cout << ", ";
         switch (enemy.getDirection().getHorizontal())
         {
         case Direction::LEFT:
-        if (disp)
-            cout << "LEFT";
+            enemyDirY.push_back(-1);
+            if (disp)
+            {
+                cout << "LEFT";
+            }                
             break;
         case Direction::RIGHT:
-        if (disp)
-            cout << "RIGHT";
+            enemyDirY.push_back(1);
+            if (disp)
+            {
+                cout << "RIGHT";
+            }
             break;
         default:
             cout << "Unknown direction!";
         }
-    if (disp)
-            cout << "]" << endl;
-
-            colE.push_back(enemy.getPosition().getX());
-            rowE.push_back(enemy.getPosition().getY());
-        }
-        int i = 0;
-        int j = 0;
-
-        
-        for (capnp::List<Cell>::Reader cellList : response.getCells())
+        if (disp)
         {
-            j = 0;
-            for (Cell::Reader cell : cellList)
-            {
-                table[i][j] = cell.getOwner();
-                if(disp){
-                    bool enemyOrUnit = false;
-                    for(int indU = 0;indU<posY.size();indU++)
-                    {
-                         if (j == posY[indU] && i == posX[indU])
-                         {
-                            cout << "* ";
-                            enemyOrUnit = true;
-                            break;
-                         }
-                           
-                    }
-                    for(int indE = 0;indE<rowE.size();indE++)
-                    {
-                        if (j == rowE[indE] && i == colE[indE])
-                        {
-                            cout << "  ";
-                            enemyOrUnit = true;
-                            break;
-                        }
-                    }
-                    if(!enemyOrUnit)
-                        cout << cell.getOwner() << " ";
-                }
-                j++;
-            }
-            if(disp)
-                cout << endl;
-            i++;
+            cout << "]" << endl;
         }
-    if(disp)
-    cout << endl;
+        enemyPosX.push_back(enemy.getPosition().getX());
+        enemyPosY.push_back(enemy.getPosition().getY());
+    }
+    int i = 0;
+    int j = 0;
+
+    for (capnp::List<Cell>::Reader cellList : response.getCells())
+    {
+        j = 0;
+        for (Cell::Reader cell : cellList)
+        {
+            table[i][j] = cell.getOwner();
+            if (disp)
+            {
+                bool enemyOrUnit = false;
+                for (int indU = 0; indU < posY.size(); indU++)
+                {
+                    if (j == posY[indU] && i == posX[indU])
+                    {
+                        cout << "* ";
+                        enemyOrUnit = true;
+                        break;
+                    }
+                }
+                for (int indE = 0; indE < enemyPosY.size(); indE++)
+                {
+                    if (j == enemyPosY[indE] && i == enemyPosX[indE])
+                    {
+                        cout << "  ";
+                        enemyOrUnit = true;
+                        break;
+                    }
+                }
+                if (!enemyOrUnit)
+                    cout << cell.getOwner() << " ";
+            }
+            j++;
+        }
+        if (disp)
+            cout << endl;
+        i++;
+    }
+    if (disp)
+        cout << endl;
 }
 
 /*

@@ -70,8 +70,7 @@ void goToUpperLeftCorner(int sockfd, int teamClassNumber)
         }
     }
 
-    
-    while (posX[0] < minRow - 1)
+        while (posX[0] < minRow - 1)
     {
         sendCommand(sockfd, teamClassNumber, Direction::DOWN);
         receiveResponse(sockfd);
@@ -81,4 +80,138 @@ void goToUpperLeftCorner(int sockfd, int teamClassNumber)
         sendCommand(sockfd, teamClassNumber, Direction::RIGHT);
         receiveResponse(sockfd);
     }
+}
+
+void totyogas(int sockfd, int teamClassNumber, uint stateIndex,
+              int playgroundUpperIndex, int playgroundLowerIndex,
+              int playgroundLeftIndex, int playgroundRightIndex)
+{
+    bool totyogjunke = true;
+    int stepLimit = 1000;
+
+    while (totyogjunke)
+    {
+        stepLimit = 1000;
+        // stateIndex % 2 = 0 -> vizszintesen megyunk -> x-et!!! kell vizsgalni
+        if (stateIndex % 2 == 0)
+        {
+            for (int enemyIndex = 0; enemyIndex < enemyDirX.size(); ++enemyIndex)
+            {
+                //cout << "posX: " << posX[0] << " posY: " << posY[0] << endl;
+                //cout << "enemyPosX: " << enemyPosX[enemyIndex] << " enemyPosY: " << enemyPosY[enemyIndex] << endl;
+                //cout << "enemyDirX: " << enemyDirX[enemyIndex] << " enemyDirY: " << enemyDirY[enemyIndex] << endl;
+
+                if (posX[0] < enemyPosX[enemyIndex])
+                {
+                    if (enemyDirX[enemyIndex] == -1)
+                    {
+                        int temp = abs(enemyPosX[enemyIndex] - posX[0]);
+                        if (temp < stepLimit)
+                        {
+                            stepLimit = temp;
+                        }
+                    }
+                    else
+                    {
+                        int temp = abs(enemyPosX[enemyIndex] - posX[0]) +
+                                2 * abs(enemyPosX[enemyIndex] - playgroundLowerIndex);
+                        if (temp < stepLimit)
+                        {
+                            stepLimit = temp;
+                        }
+                    }
+                }
+                else if (posX[0] > enemyPosX[enemyIndex])
+                {    
+                    if (enemyDirX[enemyIndex] == 1)
+                    {
+                        int temp = abs(enemyPosX[enemyIndex] - posX[0]);
+                        if (temp < stepLimit)
+                        {
+                            stepLimit = temp;
+                        }
+                    }
+                    else
+                    {
+                        int temp = abs(enemyPosX[enemyIndex] - posX[0]) +
+                                2 * abs(enemyPosX[enemyIndex] - playgroundUpperIndex);
+                        if (temp < stepLimit)
+                        {
+                            stepLimit = temp;
+                        }
+                    }
+                }
+                else
+                {
+                    //TODO
+                    stepLimit = 0;
+                }
+            }
+
+            totyogjunke = (stepLimit < playgroundRightIndex - playgroundLeftIndex + 1);
+        }
+        else
+        {
+            for (int enemyIndex = 0; enemyIndex < enemyDirY.size(); ++enemyIndex)
+            {
+                if (posY[0] < enemyPosY[enemyIndex])
+                {
+                    if (enemyDirY[enemyIndex] == -1)
+                    {
+                        int temp = abs(enemyPosY[enemyIndex] - posY[0]);
+                        if (temp < stepLimit)
+                        {
+                            stepLimit = temp;
+                        }
+                    }
+                    else
+                    {
+                        int temp = abs(enemyPosY[enemyIndex] - posY[0]) +
+                                2 * abs(enemyPosY[enemyIndex] - playgroundRightIndex);
+                        if (temp < stepLimit)
+                        {
+                            stepLimit = temp;
+                        }
+                    }
+                }
+                else if (posY[0] > enemyPosY[enemyIndex])
+                {
+                    if (enemyDirY[enemyIndex] == 1)
+                    {
+                        int temp = abs(enemyPosY[enemyIndex] - posY[0]);
+                        if (temp < stepLimit)
+                        {
+                            stepLimit = temp;
+                        }
+                    }
+                    else
+                    {
+                        int temp = abs(enemyPosY[enemyIndex] - posY[0]) +
+                                2 * abs(enemyPosY[enemyIndex] - playgroundLeftIndex);
+                        if (temp < stepLimit)
+                        {
+                            stepLimit = temp;
+                        }
+                    }
+                }
+                else
+                {
+                    //TODO
+                    stepLimit = 0;
+                }
+            }
+
+            totyogjunke = (stepLimit < playgroundLowerIndex - playgroundUpperIndex + 1);
+        }
+    
+        cout << "steplimit: " << stepLimit << endl;
+
+        if (totyogjunke)
+        {
+            sendCommand(sockfd, teamClassNumber, Direction::RIGHT);
+            receiveResponse(sockfd);
+            sendCommand(sockfd, teamClassNumber, Direction::LEFT);
+            receiveResponse(sockfd);
+        }
+    }    
 }

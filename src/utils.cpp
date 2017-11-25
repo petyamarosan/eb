@@ -93,7 +93,7 @@ void totyogas(int sockfd, int teamClassNumber, uint stateIndex,
     {
         stepLimit = 1000;
         // stateIndex % 2 = 0 -> vizszintesen megyunk -> x-et!!! kell vizsgalni
-        if (stateIndex % 2 == 0)
+        if (stateIndex % 2 == 1)
         {
             for (int enemyIndex = 0; enemyIndex < enemyDirX.size(); ++enemyIndex)
             {

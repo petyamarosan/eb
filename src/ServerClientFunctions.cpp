@@ -18,6 +18,10 @@ vector<int> posX, posY;
 vector<int> enemyPosX, enemyPosY;
 vector<int> enemyDirX, enemyDirY;
 uint currentHealth;
+int prevLevel = -1;
+int level = 0;
+bool newLevel;
+
 /*
  * Send a login request to the server
  * fd - socket's file descriptor
@@ -86,6 +90,10 @@ void receiveResponse(int fd, bool disp = true)
     Response::Info::Reader info = response.getInfo();
     if (disp)
         cout << "\n \tOwns: " << info.getOwns() << "\n \tLevel: " << info.getLevel() << "\n \tTick: " << info.getTick();
+
+    prevLevel = level;
+    level = info.getLevel();
+    newLevel = (level != prevLevel);
 
     for (Unit::Reader unit : response.getUnits())
     {

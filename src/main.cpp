@@ -26,8 +26,7 @@ int main(int argc, char *argv[])
     int sockfd = setUpClient();
     int state = 0;
     int margin = 20;
-    vector<vector<int>> LUT = {{2, 3}, {1, 2}, {0, 1}, {3, 0}};
-    //vector<vector<int>> LUT = {{3, 2}, {0, 3}, {1, 0}, {2, 1}};
+    vector<vector<int>> LUT = {{3, 2}, {0, 3}, {1, 0}, {2, 1}};
     int playgroundUpperIndex = 2;
     int playgroundLowerIndex = 77;
     int playgroundLeftIndex = 2;
@@ -50,21 +49,21 @@ int main(int argc, char *argv[])
             totyogas(sockfd, 0, stateIndex, playgroundUpperIndex, playgroundLowerIndex,
             playgroundLeftIndex, playgroundRightIndex);
 
-            if (moveUnit(sockfd, playgroundSize[(stateIndex + 1) % 2] + 1, static_cast<Direction>(LUT[stateIndex][1])))
+            if (moveUnit(sockfd, playgroundSize[stateIndex % 2] + 1, static_cast<Direction>(LUT[stateIndex][1])))
             {
                 switch(stateIndex)
                 {
                     case 0:
-                        playgroundUpperIndex += margin;
+                        playgroundLeftIndex += margin;
                         break;
                     case 1:
-                        playgroundRightIndex -= margin;
-                        break;
-                    case 2:
                         playgroundLowerIndex -= margin;
                         break;
+                    case 2:
+                        playgroundRightIndex -= margin;
+                        break;
                     case 3:
-                        playgroundLeftIndex += margin;
+                        playgroundUpperIndex += margin;
                         break;
                 }
                 playgroundSize = vector<int>{playgroundLowerIndex - playgroundUpperIndex + 1,
@@ -74,6 +73,20 @@ int main(int argc, char *argv[])
             }
             else
             {
+                break;
+            }
+            if (newLevel)
+            {
+                cout << "newlevel!!!" << endl;
+                newLevel = false;
+                playgroundUpperIndex = 2;
+                playgroundLowerIndex = 77;
+                playgroundLeftIndex = 2;
+                playgroundRightIndex = 97;
+                playgroundSize = vector<int>{playgroundLowerIndex - playgroundUpperIndex + 1,
+                               playgroundRightIndex - playgroundLeftIndex + 1};
+                margin = 20;
+                state = 0;
                 break;
             }
         }
